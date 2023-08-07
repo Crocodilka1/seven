@@ -14,14 +14,15 @@ class EntryShipped extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $content;
+    public $data, $user;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($content)
+    public function __construct($data, $user)
     {
-        $this->content = $content;
+        $this->data = $data;
+        $this->user = $user;
     }
 
     /**
@@ -30,8 +31,8 @@ class EntryShipped extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('firstTryMail@example.com', 'firstTry'),
-            subject: 'Entry Shipped',
+            from: new Address('Vakancy@example.com', 'Vakancy'),
+            subject: 'New entry',
         );
     }
 
@@ -43,7 +44,9 @@ class EntryShipped extends Mailable
         return new Content(
             view: 'email',
             with: [
-                'content' => $this->content,
+                'name' => $this->user,
+                'content' => $this->data['content'],
+                'time' => $this->data['timeToCreate']
             ]
         );
     }

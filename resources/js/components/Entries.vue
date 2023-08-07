@@ -23,6 +23,15 @@
             </tbody>
         </table>
     </template>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item"><a type="button" class="page-link" @click="store.getEntries({page: entryStore.current_page - 1})">Previous</a></li>
+            <template v-for="id in entryStore.last_page">
+                <li class="page-item"><a type="button" class="page-link" @click="store.getEntries({page: id})">{{ id }}</a></li>
+            </template>
+            <li class="page-item"><a type="button" class="page-link" @click="store.getEntries({page: entryStore.current_page + 1})">Next</a></li>
+        </ul>
+    </nav>
     <div v-if="loginStore.user">
         <input type="text" v-model="content" placeholder="Enter the entry">
         <input type="button" @click.prevent="store.putEntry({content: this.content, user_id: loginStore.user.id})" class="btn btn-primary" value="Send">

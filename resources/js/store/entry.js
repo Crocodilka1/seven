@@ -2,7 +2,10 @@ import {defineStore} from 'pinia'
 
 export const showEntries = defineStore('entry', {
     state: () => ({
-        entries: null
+        entries: null,
+        last_page: null,
+        links: null,
+        current_page: null
     }),
 
     actions: {
@@ -14,11 +17,28 @@ export const showEntries = defineStore('entry', {
             })
         },
 
-        getEntries() {
-            axios.get('/api/entry')
-            .then(res => {
-                this.entries = res.data
-            })
+        getEntries(data) {
+            if (data && data.page >= 1 && data.page <= this.last_page) {
+                axios.get(this.links[data.page].url)
+                .then(res => {
+                    console.log(res.data)
+                    this.entries = res.data.data
+                    this.last_page = res.data.last_page
+                    this.current_page = res.data.current_page
+                    this.links = res.data.links
+                })
+            }
+            else {
+                axios.get('/api/entry')
+                .then(res => {
+                    console.log(res.data)
+                    this.entries = res.data.data
+                    this.last_page = res.data.last_page
+                    this.current_page = res.data.current_page
+                    this.links = res.data.links
+                })
+            }
+
         },
 
         editEntry(data) {

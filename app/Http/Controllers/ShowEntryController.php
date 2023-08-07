@@ -10,7 +10,8 @@ class ShowEntryController extends Controller
 {
     public function __invoke()
     {
-        $entries = Entry::all();
-        return $entries;
+        $entriesSort = Entry::orderBy('created_at', 'desc')->paginate(3);
+        //$entries = $entriesSort->paginate(1);
+        return $entriesSort;
     }
 }

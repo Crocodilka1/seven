@@ -7,7 +7,8 @@
         <title>Laravel</title>
     </head>
     <body class="antialiased">
-       Test Email
-       {{ $content }}
+        {{ $name }} <br/>
+        {{ $content }} <br/>
+        {{ $time }} <br/>
     </body>
 </html>
