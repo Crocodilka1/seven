@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Entry;
@@ -15,6 +16,7 @@ use DateTimeZone;
 class PutEntryController extends Controller
 {
     public function create(Request $request) {
+        $admin = DB::table('users')->where('name', 'Admin')->get();
         $validator = Validator::make($request->all(), [
             'content' => ['required', 'string', 'min:10', 'max:255'],
             'user_id' => '',
@@ -33,6 +35,6 @@ class PutEntryController extends Controller
 
         $date = new DateTime('now', new DateTimeZone('Europe/Moscow'));
         $data['timeToCreate'] = $date->format('Y-m-d H:i:s');
-        Mail::to('crocodilka1@gmail.com')->send(new EntryShipped($data, $user));
+        Mail::to($admin[0]->email)->send(new EntryShipped($data, $user));
     }
 }

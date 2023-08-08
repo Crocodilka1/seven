@@ -12,7 +12,6 @@ export const showEntries = defineStore('entry', {
         putEntry(data) {
             axios.post('/api/entry', {content: data.content, user_id: data.user_id})
             .then(res => {
-                console.log(res.data)
                 this.getEntries()
             })
         },
@@ -21,7 +20,6 @@ export const showEntries = defineStore('entry', {
             if (data && data.page >= 1 && data.page <= this.last_page) {
                 axios.get(this.links[data.page].url)
                 .then(res => {
-                    console.log(res.data)
                     this.entries = res.data.data
                     this.last_page = res.data.last_page
                     this.current_page = res.data.current_page
@@ -31,7 +29,6 @@ export const showEntries = defineStore('entry', {
             else {
                 axios.get('/api/entry')
                 .then(res => {
-                    console.log(res.data)
                     this.entries = res.data.data
                     this.last_page = res.data.last_page
                     this.current_page = res.data.current_page
@@ -51,7 +48,6 @@ export const showEntries = defineStore('entry', {
         deleteEntry(data) {
             axios.delete(`/api/entry/${data.id}`)
             .then(res => {
-                console.log('Deleted')
                 this.getEntries()
             })
         }

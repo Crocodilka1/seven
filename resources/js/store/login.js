@@ -25,7 +25,6 @@ export const useLogin = defineStore('login', {
                     this.message = res.data.message
                     if (this.success) {
                         this.user = res.data.user
-                        console.log(res.data)
                         localStorage.setItem('access_token', res.data.token)
                         router.push({name: 'entries'})
                     }

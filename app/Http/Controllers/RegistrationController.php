@@ -13,7 +13,7 @@ class RegistrationController extends Controller
     public function validator(Request $request)
     {
         return Validator::make($request, [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
@@ -38,7 +38,14 @@ class RegistrationController extends Controller
 
         $data = $validator->validated();
         $data['password'] = Hash::make($data['password']);
-        $data['role'] = User::role_ADMIN;
+        if ($data['name'] == 'Admin') 
+        {
+            $data['role'] = User::role_ADMIN;
+        }
+        else 
+        {
+            $data['role'] = User::role_USER;
+        }
 
         User::create($data);
     }
