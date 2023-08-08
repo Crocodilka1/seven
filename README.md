@@ -13,4 +13,8 @@
    - npx vite build
    - npm run dev
    - php artisan serve
-4. Перейдите по ссылке http://http://127.0.0.1:8000
+4. База данный sqlite находится в папке database\database.sqlite
+5. Для авторизации под админом:
+   Логин: crocodilka1@gmail.com
+   Пароль: 06092018AbCd
+6. Перейдите по ссылке http://http://127.0.0.1:8000
