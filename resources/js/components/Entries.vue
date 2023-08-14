@@ -24,7 +24,7 @@
                         </template>
                         <template v-if="loginStore.user && (entri.user_id == loginStore.user.id || loginStore.user.role == 0)">
                             <template v-if="entri.id == entryStore.editId">
-                                <td><input @click.prevent="store.editEntry({id: entri.id, content: this.editContent})" class="btn btn-success col-5" value="Ok">
+                                <td><input @click.prevent="store.editEntry({content: this.editContent, id: entri.id}), nullContent()" class="btn btn-success col-5" value="Ok">
                                 <input @click.prevent="store.cancelEdit()" class="btn btn-danger col-5" value="Cancel"></td>
                             </template>
                             <template v-else>
@@ -68,6 +68,13 @@
 
         computed: {
             ...mapStores(showEntries, useLogin),
-        },    
+        },   
+        
+        methods: {
+            nullContent()
+            {
+                this.editContent = null
+            }
+        }
     }   
 </script>
