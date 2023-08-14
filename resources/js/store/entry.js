@@ -5,14 +5,28 @@ export const showEntries = defineStore('entry', {
         entries: null,
         last_page: null,
         links: null,
-        current_page: null
+        current_page: null,
+        editId: null,
+        success_message: null,
+        error_message: null
     }),
 
     actions: {
         putEntry(data) {
             axios.post('/api/entry', {content: data.content, user_id: data.user_id})
             .then(res => {
+                this.success_message = res.data.message
                 this.getEntries()
+                this.error_message = null
+                setTimeout(() => {this.success_message = null}, 3000)
+                
+            })
+            .catch(error => {
+                if (error.response.status === 422) {
+                    console.log(error.response.data.errors.content[0])
+                    this.success_message = null
+                    this.error_message = error.response.data.errors.content[0]
+                }
             })
         },
 
@@ -39,17 +53,41 @@ export const showEntries = defineStore('entry', {
         },
 
         editEntry(data) {
-            axios.patch(`/api/entry/${data.id}`, {content: data.content})
-            .then(res => {
-                this.getEntries()
-            })
+            if (localStorage.getItem('access_token')) {
+                axios.patch(`/api/entry/${data.id}`, {content: data.content, entry_id: data.id}, {headers: {"Authorization": `Bearer ${localStorage.getItem('access_token')}`}})
+                .then(res => {
+                    this.editId = null
+                    this.getEntries()
+                    this.error_message = null
+                    this.success_message = res.data
+                    setTimeout(() => {this.success_message = null}, 1500)
+                })
+                .catch(error => {
+                    if (error.response.status === 422) {
+                        console.log(error.response.data.errors.content[0])
+                        this.error_message = error.response.data.errors.content[0]
+                    }
+                })
+            }
+        },
+
+        successEdit(data) {
+            this.editId = data.id
         },
 
         deleteEntry(data) {
-            axios.delete(`/api/entry/${data.id}`)
-            .then(res => {
-                this.getEntries()
-            })
-        }
+            if(localStorage.getItem('access_token')) {
+                axios.delete(`/api/entry/${data.id}`, {headers: {"Authorization": `Bearer ${localStorage.getItem('access_token')}`}})
+                .then(res => {
+                    this.success_message = res.data
+                    this.getEntries()
+                    setTimeout(() => {this.success_message = null}, 1500)
+                })
+            }
+        },
+
+        cancelEdit() {
+            this.editId = null
+        },
     }
 })

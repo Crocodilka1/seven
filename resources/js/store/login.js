@@ -7,7 +7,7 @@ export const useLogin = defineStore('login', {
         error_email: null,
         error_name: null,
         error_password: null,
-        success: true,
+        success: false,
         message: null
     }),
 
@@ -19,36 +19,49 @@ export const useLogin = defineStore('login', {
 
     actions: {
         login(data) {
-                axios.post('/api/login', {email: data.email, password: data.password})
+                axios.post('/api/auth/login', {email: data.email, password: data.password})
                 .then(res => {
                     this.success = res.data.success
                     this.message = res.data.message
                     if (this.success) {
-                        this.user = res.data.user
-                        localStorage.setItem('access_token', res.data.token)
-                        router.push({name: 'entries'})
-                    }
+                            this.user = res.data.user
+                            localStorage.setItem('userData', JSON.stringify(this.user))
+                            localStorage.setItem('access_token', res.data.access_token)
+                            setTimeout(() => {router.push({name: 'entries'})}, 1500)
+                        }
                 })
         },
 
         logout() {
-            axios.post('/api/logout')
-            .then(res => {
-                if (res.data) this.user = null
-                router.push({name: 'main'})
-            })
+            localStorage.removeItem('userData')
+            localStorage.removeItem('access_token')
+            this.user = null
+            this.message = null
+            this.success = false
         },
 
         register(data) {
-            axios.post('/api/register', {email: data.email, name: data.name, password: data.password, password_confirmation: data.password_confirmation})
+            axios.post('/api/auth/register', {email: data.email, name: data.name, password: data.password, password_confirmation: data.password_confirmation})
             .then(res => {
-                if(res.data){
-                if (res.data.email) this.error_email = res.data.email[0]
-                if (res.data.name) this.error_name = res.data.name[0]
-                if (res.data.password) this.error_password = res.data.password[0]
-                }
-                else router.push({name: 'login'})
+                this.error_email = null
+                this.error_name = null
+                this.error_password = null
+                this.message = res.data.success_message
+                setTimeout(() => {this.message = null 
+                    router.push({name: 'login'})}, 1500)
             })
+            .catch(error => {
+                if (error.response.status === 422) {
+                    this.error_email = error.response.data.errors['email'] ? error.response.data.errors['email'][0] : null
+                    this.error_name = error.response.data.errors['name'] ? error.response.data.errors['name'][0] : null
+                    this.error_password = error.response.data.errors['password'] ? error.response.data.errors['password'][0] : null
+                }
+            })
+        },
+
+        checkUser()
+        {
+            this.user = JSON.parse(localStorage.getItem('userData'))
         }
     }
 })

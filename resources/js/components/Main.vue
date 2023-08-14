@@ -3,6 +3,7 @@
     import { mapStores } from 'pinia'
     import { router } from "../router.js"
     const store = useLogin()
+    store.checkUser()
 </script>
 
 <template>
@@ -37,12 +38,6 @@
 
 <script>
 export default {
-    // data() {
-    //     retrun {
-    //         name: 
-    //     }
-    // }
-
     computed: {
         ...mapStores(useLogin),
     },

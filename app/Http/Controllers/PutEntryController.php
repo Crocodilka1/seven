@@ -3,38 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Models\Entry;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EntryShipped;
 use App\Models\User;
+use App\Http\Requests\EditRequest;
 use DateTime;
 use DateTimeZone;
+use Exception;
 
 class PutEntryController extends Controller
 {
-    public function create(Request $request) {
-        $admin = DB::table('users')->where('name', 'Admin')->get();
-        $validator = Validator::make($request->all(), [
-            'content' => ['required', 'string', 'min:10', 'max:255'],
-            'user_id' => '',
-        ]);
+    public function create(EditRequest $request) {
+        
+        $admins = User::where('role', 0)->get();
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors());
+        $data = $request->validated();
+
+        $result = [];
+
+        if (isset($admins[0])) {
+            foreach ($admins as $admin)
+            {
+                $dataForSend = [];
+                $dataForSend['content'] = $data['content'];
+                if ($data['user_id']) $user = User::find($data['user_id'])->name;
+                else $user = 'Anonymus';
+                $date = new DateTime('now', new DateTimeZone('Europe/Moscow'));
+                $dataForSend['timeToCreate'] = $date->format('Y-m-d H:i:s');
+                $dataForSend['admin_email'] = $admin->email;
+                $result[] = $dataForSend;
+
+                /* Аккаунт на mailgun заблокировали, отправкиписем пока не будет. 
+                В консоли выводятся почтовые ящики админов*/
+
+                // try {
+                //     Mail::to($admin->email)->send(new EntryShipped($dataForSend, $user));
+                // } catch (Exception $e)
+                // {
+                //     $errors[] = 'Сообщение отправлено ' + $admin->email;
+                // }
+            }
         }
-
-        $data = $validator->validated();
-
-        if ($data['user_id']) $user = User::find($data['user_id'])->name;
-        else $user = 'Anonymus';
-
+        
         Entry::create($data);
 
-        $date = new DateTime('now', new DateTimeZone('Europe/Moscow'));
-        $data['timeToCreate'] = $date->format('Y-m-d H:i:s');
-        Mail::to($admin[0]->email)->send(new EntryShipped($data, $user));
+        $response = ['message' => 'Entry create', 'results' => $result];
+
+        return response()->json($response);
     }
 }

@@ -5,6 +5,7 @@ const store = useLogin()
 </script>
 <template>
     <div class="position-absolute top-50 start-50 translate-middle col-3">
+            <div v-if="loginStore.message" class="alert alert-success">{{ loginStore.message }}</div>
             <div class="mb-3">
                 <label class="form-label">E-MAIL</label>
                 <input v-model="email" type="email" class="form-control" placeholder="Email">

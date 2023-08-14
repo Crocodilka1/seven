@@ -11,6 +11,6 @@ class DeleteEntryController extends Controller
     public function __invoke(Entry $entry)
     {
         $entry->delete();
-        return 'Deleted';
+        return response('Deleted');
     }
 }
